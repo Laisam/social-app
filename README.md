@@ -1,5 +1,5 @@
 # Social App.
-A simple website for meeting new friend.
+A simple website for meeting new friends.
 
 ## Features
 - clearly show everyone user
