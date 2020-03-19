@@ -1,10 +1,29 @@
-.global-icon {
-    width: 12px;
-    height: 12px;
-    background-position: -28px -499px;
-    background-image: url("https://weichiachang.github.io/easter-eggs-mobile/images/3o8Zo7X.png");
-    background-size: 73px 540px;
-    background-repeat: no-repeat;
-    display: inline-block;
-    margin-left: 4px;
+.carousel .carousel-item {
+    height: 500px;
   }
+  #display-person{
+      padding: 50px;
+  }
+
+#display-person img{
+    border-radius: 50%;
+    padding:0px;
+}
+
+input {
+    padding:5px 15px; border:2px black solid;
+    -webkit-border-radius: 5px;
+    border-radius: 5px;
+}
+
+#filter-settings {
+    border:2px gray solid;
+    -webkit-border-radius: 5px;
+    border-radius: 5px;
+    padding: 1em;
+}
+
+
+/* * {
+    border: 1px solid black;
+} */
