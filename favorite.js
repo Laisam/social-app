@@ -1,53 +1,45 @@
 (function(){
     const BASE_URL = 'https://lighthouse-user-api.herokuapp.com'
     const INDEX_URL = BASE_URL + '/api/v1/users/'
-    const data = []
     const displayPanel = document.getElementById('display-panel')
     const personInfo = document.getElementById('show-person-info')
     const pagination = document.getElementById('page-navigation')
     const genderFilter =document.getElementById('gender-filter')
-    const ageFilter = document.getElementById('age-filter')
-    const minInput = document.getElementById('min-input')
-    const maxInput =document.getElementById('max-input')
-    const resetBnt = document.getElementById('reset')
     const modeSelector = document.getElementById('mode-selector')
     const ITEM_PER_PAGE = 15
-    let favoriteList = JSON.parse(localStorage.getItem('favoritePeople')) || []
     let currentPage = 1
-    let currentData =[]
     let currentMode ='card'
     let maxPage = 1
-    let minAge = 100
-    let maxAge = 0
-    
+    const data = JSON.parse(localStorage.getItem('favoritePeople'))
+    let currentData = data
 
-    axios.get(INDEX_URL)
-        .then((response) => {
-            data.push(...response.data.results)
-            console.log(data)
-            currentData = data
-            ageFiltered = data
-            genderFiltered = data
+    console.log(data)
+    totalPage(data)
+    getPage(1,data,currentMode)
 
-            getMinMaxAge(data)
-            totalPage(data)
-            getPage(1,data,currentMode)
-        })
-        .catch((error) => console.log(error))
 
-    function reset(){
-        currentData = data
-        currentPage = 1
-        currentMode ='card'
-        totalPage(data)
-        getPage(1,data,'card')
-    }
-    function getMinMaxAge(data){
-        for (let person of data){
-            if(person.age > maxAge) maxAge = person.age
-            if(person.age < minAge) minAge = person.age
+
+
+    //filter
+
+    genderFilter.addEventListener('click', (event)=> {
+        if(event.target.matches('#male')){
+            currentData = data.filter(data => data.gender === 'male')
         }
-    }
+        else if(event.target.matches('#female')){
+            currentData = data.filter(data => data.gender === 'female')
+        }
+        else {
+            currentData = data
+        }
+        // if(minInput.value !== '' && maxInput.value !== '')  
+        //     filter_age(minInput.value,maxInput.value)
+
+        console.log(currentData)
+        totalPage(currentData)
+        getPage(1,currentData,currentMode)
+    })
+
     // mode
 
     modeSelector.addEventListener('click', (event) => {
@@ -62,46 +54,9 @@
         getPage(currentPage,currentData,currentMode)
     })
 
-    // filter
+     //display
 
-    function filter_age(min,max){
-        currentData = currentData.filter(person => person.age >= min)
-        currentData = currentData.filter(person => person.age <= max)
-    }
-    ageFilter.addEventListener('click', (event) => {
-        event.preventDefault()
-        let min = minInput.value
-        let max = maxInput.value
-        if(event.target.matches('.btn')){
-            filter_age(min,max)
-            totalPage(currentData)
-            getPage(1,currentData,currentMode)
-            console.log(currentData)
-        }
-    })
-    genderFilter.addEventListener('click', (event)=> {
-        if(event.target.matches('#male')){
-            currentData = data.filter(data => data.gender === 'male')
-        }
-        else if(event.target.matches('#female')){
-            currentData = data.filter(data => data.gender === 'female')
-        }
-        else {
-            currentData = data
-        }
-        if(minInput.value !== '' && maxInput.value !== '')  
-            filter_age(minInput.value,maxInput.value)
-
-        console.log(currentData)
-        totalPage(currentData)
-        getPage(1,currentData,currentMode)
-    })
-
-
-    
-    //display
-
-    function displayCard(data){
+     function displayCard(data){
         let htmlContent = ''
         for(let person of data){
             htmlContent += `
@@ -154,7 +109,6 @@
         displayPanel.innerHTML = htmlContent
     }
 
-
     // modal
 
     displayPanel.addEventListener('click', (event) => {
@@ -180,7 +134,7 @@
                 </div>
 
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-outline-danger" id="add-favorite" data-id="${person.id}" data-dismiss="modal"><i class="far fa-heart"></i> Like</button>
+                    <button type="button" class="btn btn-outline-success" id="add-favorite" data-id="${person.id}" data-dismiss="modal"><i class="fas fa-heart-broken"></i> Unlike</button>
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                 </div> 
                 `
@@ -189,42 +143,27 @@
     
     }
 
-    // favorite
+    //  favorite-delete
+
     personInfo.addEventListener('click', (event) => {
         if(event.target.matches('#add-favorite')){
-            let id = event.target.dataset.id
-            addFavorite(id)
-            getPage(currentPage,currentData,currentMode)
+            deleteFavorite(event.target.dataset.id)
         }
     })
 
-    function addFavorite(id){
-        const favoritePerson  = data.find( person => person.id === Number(id))
+    function deleteFavorite(id){
+        const deleteIndex = data.findIndex(person => person.id === Number(id))
 
-        if(favoriteList.some(item => item.id === Number(id)))
-            alert(`Already in the favorite list.`)
-        else{
-            favoriteList.push(favoritePerson)
-            // alert(`Added  ${data.name} ${data.surname} to your favorite list!`)
-        }
-        localStorage.setItem('favoritePeople',JSON.stringify(favoriteList))
-        console.log(favoriteList)
+        data.splice(deleteIndex,1)
+        localStorage.setItem('favoritePeople',JSON.stringify(data))
+        console.log(data)
+        currentData = data
+        totalPage(currentData)
+        getPage(currentPage,currentData,currentMode)
     }
 
-    function markFavorite(data){
-        for (let person of favoriteList){
-            data.forEach(index => { 
-                if(index.id === person.id){
-                    let avatar = document.getElementById(`${person.id}`)
-                    avatar.setAttribute('style','border:5px #FE5B5B solid')
-                }
-            })
-            
-        }
-    }
-    
+
     // page
-
     function totalPage(data){
         maxPage =  Math.ceil(data.length/ITEM_PER_PAGE) || 1
         let htmlContent = `
@@ -258,7 +197,6 @@
         else if(currentMode === 'list'){
             displayList(sliceData)
         }
-        markFavorite(sliceData)
     }
 
     pagination.addEventListener('click', function(event){
@@ -269,13 +207,6 @@
             currentPage = event.target.dataset.page
         }
         getPage(currentPage,currentData,currentMode)
-    })
-
-
-    //reset
-
-    resetBnt.addEventListener('click', () =>{
-        reset()
     })
 
 })()
