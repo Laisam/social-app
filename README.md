@@ -4,9 +4,7 @@ A simple website for meeting new friends.
 https://yenlai.github.io/social-website/
 
 ## Features
-- clearly show everyone user
-- touch the avatar to know more
-
-
-## Additional functions are developing
-- favorite List : add users to your favorite list
+- You can filter users with **gender** and **age**
+- Click the avatar to get more information
+- Select your mode - **List mode** or **Card mode**
+- Add users to your favorite list
