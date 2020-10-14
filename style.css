@@ -13,6 +13,11 @@
 #displayList img{
     border-radius: 50%;
     padding:0px;
+    width: 150px;
+    height: 150px;
+}
+.favorite-img {
+    border:4px #FE5B5B solid;
 }
 input {
     padding:5px 15px; border:2px black solid;

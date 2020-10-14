@@ -1,25 +1,25 @@
-(function(){
+(function () {
     const BASE_URL = 'https://lighthouse-user-api.herokuapp.com'
     const INDEX_URL = BASE_URL + '/api/v1/users/'
     const data = []
     const displayPanel = document.getElementById('display-panel')
     const personInfo = document.getElementById('show-person-info')
     const pagination = document.getElementById('page-navigation')
-    const genderFilter =document.getElementById('gender-filter')
+    const genderFilter = document.getElementById('gender-filter')
     const ageFilter = document.getElementById('age-filter')
     const minInput = document.getElementById('min-input')
-    const maxInput =document.getElementById('max-input')
+    const maxInput = document.getElementById('max-input')
     const resetBnt = document.getElementById('reset')
     const modeSelector = document.getElementById('mode-selector')
     const ITEM_PER_PAGE = 15
     let favoriteList = JSON.parse(localStorage.getItem('favoritePeople')) || []
     let currentPage = 1
-    let currentData =[]
-    let currentMode ='card'
+    let currentData = []
+    let currentMode = 'card'
     let maxPage = 1
     let minAge = 100
     let maxAge = 0
-    
+
 
     axios.get(INDEX_URL)
         .then((response) => {
@@ -31,40 +31,40 @@
 
             getMinMaxAge(data)
             totalPage(data)
-            getPage(1,data,currentMode)
+            getPage(1, data, currentMode)
         })
         .catch((error) => console.log(error))
 
-    function reset(){
+    function reset() {
         currentData = data
         currentPage = 1
-        currentMode ='card'
+        currentMode = 'card'
         totalPage(data)
-        getPage(1,data,'card')
+        getPage(1, data, 'card')
     }
-    function getMinMaxAge(data){
-        for (let person of data){
-            if(person.age > maxAge) maxAge = person.age
-            if(person.age < minAge) minAge = person.age
+    function getMinMaxAge(data) {
+        for (let person of data) {
+            if (person.age > maxAge) maxAge = person.age
+            if (person.age < minAge) minAge = person.age
         }
     }
     // mode
 
     modeSelector.addEventListener('click', (event) => {
-        if(event.target.matches('#card-mode')){
+        if (event.target.matches('#card-mode')) {
             currentMode = 'card'
         }
 
-        else if(event.target.matches('#list-mode')){
+        else if (event.target.matches('#list-mode')) {
             currentMode = 'list'
             console.log(currentMode)
         }
-        getPage(currentPage,currentData,currentMode)
+        getPage(currentPage, currentData, currentMode)
     })
 
     // filter
 
-    function filter_age(min,max){
+    function filter_age(min, max) {
         currentData = currentData.filter(person => person.age >= min)
         currentData = currentData.filter(person => person.age <= max)
     }
@@ -72,55 +72,55 @@
         event.preventDefault()
         let min = minInput.value
         let max = maxInput.value
-        if(event.target.matches('.btn')){
-            filter_age(min,max)
+        if (event.target.matches('.btn')) {
+            filter_age(min, max)
             totalPage(currentData)
-            getPage(1,currentData,currentMode)
+            getPage(1, currentData, currentMode)
             console.log(currentData)
         }
     })
-    genderFilter.addEventListener('click', (event)=> {
-        if(event.target.matches('#male')){
+    genderFilter.addEventListener('click', (event) => {
+        if (event.target.matches('#male')) {
             currentData = data.filter(data => data.gender === 'male')
         }
-        else if(event.target.matches('#female')){
+        else if (event.target.matches('#female')) {
             currentData = data.filter(data => data.gender === 'female')
         }
         else {
             currentData = data
         }
-        if(minInput.value !== '' && maxInput.value !== '')  
-            filter_age(minInput.value,maxInput.value)
+        if (minInput.value !== '' && maxInput.value !== '')
+            filter_age(minInput.value, maxInput.value)
 
         console.log(currentData)
         totalPage(currentData)
-        getPage(1,currentData,currentMode)
+        getPage(1, currentData, currentMode)
     })
 
 
-    
+
     //display
 
-    function displayCard(data){
+    function displayCard(data) {
         let htmlContent = ''
-        for(let person of data){
+        for (let person of data) {
             htmlContent += `
             <div class="d-flex flex-column m-1" id="displayCard">
-                <img src="${person.avatar}" id="${person.id}" class="img-thumbnail" style="" data-toggle="modal" data-target="#show-info-modal">`
-            if(person.gender ==="male") {
+                <img src="${person.avatar}" id="${person.id}"  style="width:150px;" data-toggle="modal" data-target="#show-info-modal">`
+            if (person.gender === "male") {
                 htmlContent += `<h5 class="">${person.name} ${person.surname} <i class="fas fa-mars" style="color:#85CAE9" ></i><span style="color:#F8F9FA;"> , ${person.age}</span></h5>`
             }
-            else{
+            else {
                 htmlContent += `<h5 class="">${person.name} ${person.surname} <i class="fas fa-venus" style="color:#FE8585" ></i><span style="color:#F8F9FA;"> , ${person.age}</span></h5>`
             }
-            htmlContent +=`</div>`
+            htmlContent += `</div>`
         }
         displayPanel.innerHTML = htmlContent
     }
 
-    function displayList(data){
+    function displayList(data) {
         let htmlContent = `<div id="displayList" class="col-12" style="padding:auto;">`
-        for( let person of data){
+        for (let person of data) {
             htmlContent += `
             <div class="row no-gutters ">
                 <div class="col-1 offset-4">
@@ -129,14 +129,14 @@
                 <div class="col-6 offset-1">
                     <div class="card-body " style="text-align:left;">
                     `
-                    if(person.gender === 'male'){
-                        htmlContent += `<h5 class="mr-5" >${person.name} ${person.surname} , ${person.age} <i class="fas fa-mars ml-3" style="color:#85CAE9" ></i></h5>`
-                    }
-                    else{
-                        htmlContent += `<h5 class="mr-5" >${person.name} ${person.surname} , ${person.age} <i class="fas fa-venus ml-3" style="color:#FE8585" ></i></h5>`
-                    }
-                    htmlContent +=
-                    `
+            if (person.gender === 'male') {
+                htmlContent += `<h5 class="mr-5" >${person.name} ${person.surname} , ${person.age} <i class="fas fa-mars ml-3" style="color:#85CAE9" ></i></h5>`
+            }
+            else {
+                htmlContent += `<h5 class="mr-5" >${person.name} ${person.surname} , ${person.age} <i class="fas fa-venus ml-3" style="color:#FE8585" ></i></h5>`
+            }
+            htmlContent +=
+                `
                         <h6 class="my-3"><i class="fas fa-map-marker-alt"></i> ${person.region}</h6>
                         <h6 class=""> <i class="fas fa-envelope-open-text"> </i> Email : ${person.email} </h6>
                     </div>
@@ -145,10 +145,6 @@
             <div><hr><div>
             
             `
-            // <h5 class="">${person.name} ${person.surname}, ${person.age}</h5>
-            // <h6 class=""><i class="global-icon"></i> ${person.region}</h6>
-            // <h6 class=""> <i class="fas fa-birthday-cake"> </i> Birthday : ${person.birthday} </h6>
-            // <h6 class=""> <i class="fas fa-envelope-open-text"> </i> Email : ${person.email} </h6>
         }
         htmlContent += `</div>`
         displayPanel.innerHTML = htmlContent
@@ -158,15 +154,15 @@
     // modal
 
     displayPanel.addEventListener('click', (event) => {
-        if(event.target.tagName==='IMG'){
+        if (event.target.tagName === 'IMG') {
             const id = event.target.id
             showDetailData(id)
         }
     })
-    
-    
-    function showDetailData(id){
-        axios.get(INDEX_URL+id)
+
+
+    function showDetailData(id) {
+        axios.get(INDEX_URL + id)
             .then((response) => {
                 let person = response.data
                 let htmlContent = `
@@ -186,55 +182,53 @@
                 `
                 personInfo.innerHTML = htmlContent
             })
-    
+
     }
 
     // favorite
     personInfo.addEventListener('click', (event) => {
-        if(event.target.matches('#add-favorite')){
+        if (event.target.matches('#add-favorite')) {
             let id = event.target.dataset.id
             addFavorite(id)
-            getPage(currentPage,currentData,currentMode)
+            getPage(currentPage, currentData, currentMode)
         }
     })
 
-    function addFavorite(id){
-        const favoritePerson  = data.find( person => person.id === Number(id))
+    function addFavorite(id) {
+        const favoritePerson = data.find(person => person.id === Number(id))
 
-        if(favoriteList.some(item => item.id === Number(id)))
+        if (favoriteList.some(item => item.id === Number(id)))
             alert(`Already in the favorite list.`)
-        else{
+        else {
             favoriteList.push(favoritePerson)
-            // alert(`Added  ${data.name} ${data.surname} to your favorite list!`)
         }
-        localStorage.setItem('favoritePeople',JSON.stringify(favoriteList))
+        localStorage.setItem('favoritePeople', JSON.stringify(favoriteList))
         console.log(favoriteList)
     }
 
-    function markFavorite(data){
-        for (let person of favoriteList){
-            data.forEach(index => { 
-                if(index.id === person.id){
+    function markFavorite(data) {
+        for (let person of favoriteList) {
+            data.forEach(index => {
+                if (index.id === person.id) {
                     let avatar = document.getElementById(`${person.id}`)
-                    avatar.setAttribute('style','border:5px #FE5B5B solid')
+                    avatar.setAttribute('class', 'favorite-img')
                 }
             })
-            
         }
     }
-    
+
     // page
 
-    function totalPage(data){
-        maxPage =  Math.ceil(data.length/ITEM_PER_PAGE) || 1
+    function totalPage(data) {
+        maxPage = Math.ceil(data.length / ITEM_PER_PAGE) || 1
         let htmlContent = `
         <li class="page-item">
             <a href="javascript:;" class="page-link" aria-label="Previous" id="previous">
                 <span aria-hidden="true" id="previous">&laquo;</span>
             </a>
         </li>`
-        for(let i=1;i<=maxPage;i++){
-            htmlContent +=`
+        for (let i = 1; i <= maxPage; i++) {
+            htmlContent += `
             <li class="page-item " id="page-${i}">
                 <a class="page-link " href="javascript:;" data-page="${i}" >${i}</a>
             </li>
@@ -249,32 +243,32 @@
         pagination.innerHTML = htmlContent
 
     }
-    
-    function getPage(pageNum, data, currentMode){  //data有時候要拿來傳入filtered data
+
+    function getPage(pageNum, data, currentMode) {  //data有時候要拿來傳入filtered data
         let index = (pageNum - 1) * ITEM_PER_PAGE
-        let sliceData = data.slice(index , index + ITEM_PER_PAGE)
-        if(currentMode === 'card')
+        let sliceData = data.slice(index, index + ITEM_PER_PAGE)
+        if (currentMode === 'card')
             displayCard(sliceData)
-        else if(currentMode === 'list'){
+        else if (currentMode === 'list') {
             displayList(sliceData)
         }
         markFavorite(sliceData)
     }
 
-    pagination.addEventListener('click', function(event){
+    pagination.addEventListener('click', function (event) {
         console.log(event.target)
-        if(event.target.matches('#previous')) currentPage === 1 ? currentPage = 1 : currentPage --
-        else if(event.target.matches('#next')) currentPage !== maxPage ? currentPage ++ : currentPage = maxPage
-        else{
+        if (event.target.matches('#previous')) currentPage === 1 ? currentPage = 1 : currentPage--
+        else if (event.target.matches('#next')) currentPage !== maxPage ? currentPage++ : currentPage = maxPage
+        else {
             currentPage = event.target.dataset.page
         }
-        getPage(currentPage,currentData,currentMode)
+        getPage(currentPage, currentData, currentMode)
     })
 
 
     //reset
 
-    resetBnt.addEventListener('click', () =>{
+    resetBnt.addEventListener('click', () => {
         reset()
     })
 
